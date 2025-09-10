@@ -14,11 +14,13 @@ function HomePage() {
        <Header/>
        <div className='w-full h-[calc(100vh-5em)] flex justify-center items-center'>
         <Routes>
+          
             <Route path='/' element={<Home/>}/>
+            <Route path='/*' element={<ErrorPage/>}/>
             <Route path='/contact' element={<Contact/>}/>
             <Route path='/gallery' element={<Gallery/>}/>
             <Route path='/items' element={<Items/>}/>
-            <Route path='/*' element={<ErrorPage/>}/>
+            
 
         </Routes>
        </div>
