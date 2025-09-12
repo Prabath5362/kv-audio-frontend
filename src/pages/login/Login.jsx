@@ -13,6 +13,7 @@ function Login() {
     e.preventDefault();
     axios.post('http://localhost:3000/api/user/login', { email, password }).then((res) => {
       toast.success("Login Successful")
+      localStorage.setItem("token",res.data.token);
       setTimeout(() => {
         if (res.data.role === 'admin') {
           navigate("/admin");
