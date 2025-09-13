@@ -1,7 +1,9 @@
+import axios from 'axios';
 import React from 'react'
 import { useRef } from 'react';
+import toast from 'react-hot-toast';
 import { IoIosCloseCircle } from 'react-icons/io';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function UpdateItem() {
     const nameRef = useRef();
@@ -11,12 +13,40 @@ function UpdateItem() {
     const descriptionRef = useRef();
     const productCategoryRef = useRef();
     const productDimensionsRef = useRef();
+    const availabilityRef = useRef();
 
     const navigate = useNavigate();
+    const location = useLocation();
+    const item = location.state.item;
+    console.log(item);
+
+    async function updateProduct(e) {
+        e.preventDefault();
+        try {
+            await axios.put(`http://localhost:3000/api/product/updateProduct/${item.productKey}`, {
+                    productKey: productKeyRef.current.value,
+                    name: nameRef.current.value,
+                    image: productImageRef.current.value,
+                    price: priceRef.current.value,
+                    category: productCategoryRef.current.value,
+                    dimenstions: productDimensionsRef.current.value,
+                    availability: availabilityRef.current.value == "true"? true : false
+            }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            });
+            toast.success("Product update successfull");
+            navigate("/admin/items");
+        } catch (e) {
+            toast.error("Product update failed");
+        }
+
+    }
 
     return (
         <div className="flex justify-center items-center h-full bg-gradient-to-br ">
-            <form className="relative w-xl bg-white shadow-lg rounded-xl p-4 w-full max-w-xs my-4">
+            <form onSubmit={updateProduct} className="relative w-xl bg-white shadow-lg rounded-xl p-4 w-full max-w-xs my-4">
                 <h2 className="text-xs font-bold mt-5 mb-3 text-gray-800 text-center">Update Item</h2>
                 <div className="mb-2">
                     <label className="block text-gray-700 mb-1 font-medium text-[10px]" htmlFor="itemName">Item Name</label>
@@ -27,6 +57,7 @@ function UpdateItem() {
                         placeholder="Enter item name"
                         ref={nameRef}
                         required
+                        defaultValue={item.name}
                     />
                 </div>
                 <div className="mb-2">
@@ -38,6 +69,7 @@ function UpdateItem() {
                         placeholder="Enter item key"
                         ref={productKeyRef}
                         required
+                        defaultValue={item.productKey}
                     />
                 </div>
 
@@ -48,6 +80,8 @@ function UpdateItem() {
                         ref={productCategoryRef}
                         className="w-full p-1 text-xs rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
                         required
+                        defaultValue={item.category}
+
                     >
                         <option value="">Select Category</option>
                         <option value="audio">Audio</option>
@@ -64,6 +98,7 @@ function UpdateItem() {
                         placeholder="Enter dimensions"
                         ref={productDimensionsRef}
                         required
+                        defaultValue={item.dimenstions}
                     />
                 </div>
 
@@ -76,6 +111,7 @@ function UpdateItem() {
                         placeholder="Enter price"
                         ref={priceRef}
                         required
+                        defaultValue={item.price}
                     />
                 </div>
                 <div className="mb-2">
@@ -87,6 +123,7 @@ function UpdateItem() {
                         placeholder="Paste image URL"
                         ref={productImageRef}
                         required
+                        defaultValue={item.image}
                     />
                 </div>
                 <div className="mb-3">
@@ -99,7 +136,16 @@ function UpdateItem() {
                         rows="2"
                         ref={descriptionRef}
                         required
+                        defaultValue={item.description}
                     ></textarea>
+                </div>
+                <div className="mb-3">
+                    <select name="availability" id="availability" ref={availabilityRef} className="w-full p-1 text-xs rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                        defaultValue={item.availability}
+                    >
+                        <option value={true}>Available</option>
+                        <option value={false}>Unavailable</option>
+                    </select>
                 </div>
                 <button
                     className="w-full bg-gray-900 text-white py-1 rounded font-semibold text-xs hover:bg-gray-700 transition duration-200"
